@@ -14,9 +14,10 @@
     "unmeasured": "no measurement was run; the entry states what would have to be measured"
   },
   "preamble": [
-    "This is the adversarial half of the harness. Every entry is a manipulation the owner of an account can apply to their own telemetry, and every entry carries a verdict about whether the scoring in `src/tripphysics/detector.py` survives it.",
+    "This is the adversarial half of the harness, written as a registry: each entry records a manipulation or scenario, what it targets, and the measured verdict about whether the scoring in `src/tripphysics/detector.py` survives it. Entries are of two kinds: manipulations the owner of an account can apply to their own telemetry, and ways of sharing an account that need no manipulation at all (the `tier-*`, `mode-*` and similar rows, produced by changing the generator's parameters); a few were reasoned about but not measured. The counts by kind are in the summary below.",
     "Several of these attacks defeat the detector outright, including one that reduces it to catching nothing at all. Those are the useful rows. A detector's evasion surface exists whether or not it is written down; the only variable is whether the team operating it finds out before an adversary does.",
-    "Measured verdicts name the population and seed that produced them. Unmeasured verdicts say so in those words and are not softened into prose that reads like a result."
+    "Measured verdicts name the population and seed that produced them. Unmeasured verdicts say so in those words and are not softened into prose that reads like a result.",
+    "The verdicts were first measured with one-off scripts that are not in this repository. `python -m tripphysics.attack_measure` re-implements the entries marked **Re-run** below from the public API and reproduces each of their counts exactly. Every other measured entry is a record of what was run, not something this repository can re-run: it states the manipulation, the population and the seed so that it can be re-implemented."
   ],
   "attacks": [
     {
@@ -59,6 +60,7 @@
       "targets": ["handover_gap_score"],
       "detected": "caught",
       "evidence": "181/300 caught versus the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population) -- a 1pp difference, well inside the ~2.8pp binomial noise at this size.",
+      "reproduce": "python -m tripphysics.attack_measure split-trips",
       "notes": "Surprising given the arithmetic: the zero-length gaps do halve the mean, but the surviving accounts are carried by overlap_rate and mock_rate, which splitting does not touch. Dilution only pays when it moves the feature that was actually driving the score."
     },
     {
@@ -89,6 +91,7 @@
       "targets": ["mock_rate"],
       "detected": "caught",
       "evidence": "167/300 caught versus the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population).",
+      "reproduce": "python -m tripphysics.attack_measure client-mock-clear",
       "notes": "Costs the score a 1.2-weight signal, which alone is not decisive; it becomes decisive in combination -- see combined-client-scrub."
     },
     {
@@ -99,6 +102,7 @@
       "targets": ["cell_mismatch_rate"],
       "detected": "caught",
       "evidence": "153/300 caught versus the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population).",
+      "reproduce": "python -m tripphysics.attack_measure client-cell-forge",
       "notes": "The most important caveat in this registry: this attack is trivially available ONLY because the synthetic cell grid is a function of position. On live data cell_id must come from an operator-side tower join, which the account cannot forge, and this feature becomes one of the strongest signals rather than one of the weakest. The synthetic corpus understates it."
     },
     {
@@ -131,6 +135,7 @@
       ],
       "detected": "passes",
       "evidence": "0/300 caught, down from the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population). Median score 0.79 -> 0.19. Decomposed on the same population to confirm the result is an interaction and not a defect in the rig: de-overlap alone 130/300, mock-clear plus cell-forge alone 142/300, the three together 6/300, adding teleport re-anchoring 2/300, adding the speed clamp 0/300. A spot check of one attacked account confirms it is still scored on real evidence rather than routed to the evidence-free floor -- 8 trips, 215 fixes, handover_gap_score still 0.71 contributing 0.92 to a raw score of 1.74, which simply sits below the 2.5 bias.",
+      "reproduce": "python -m tripphysics.attack_measure full-client-evasion",
       "notes": "This is the attack that defeats this detector. It is worth being precise about why, because the number is more alarming than the finding: every feature it removes is either client-reported (speed, mock flag, cell id) or a within-log consistency check the client can satisfy by construction (overlap timestamps, in-trip jump cap). What it leaves untouched is handover_gap_score -- the account still teleports between trips -- but that single 2.2-weight signal against a 2.5 bias does not clear the threshold alone. The lesson is not that the detector is broken; it is that a scoring function built mostly from client-controlled fields inherits their trustworthiness, and the fix is server-side corroboration (operator tower join, server-timestamped trip boundaries), not reweighting."
     },
     {
@@ -180,6 +185,7 @@
       "targets": ["evidence_free_path", "score_ordering", "all"],
       "detected": "passes",
       "evidence": "0/300 caught (attack population seed 777, threshold from the seed 4242 honest population); every attacked account scores exactly 0.0.",
+      "reproduce": "python -m tripphysics.attack_measure silence-no-trips",
       "notes": "Not a defect in the scoring so much as a routing question the scoring cannot answer. Empty accounts belong in their own queue -- 'why is a live account emitting nothing?' -- not at the bottom of this ranking. Any deployment that ranks on this score alone inherits the blind spot."
     },
     {
@@ -190,6 +196,7 @@
       "targets": ["evidence_free_path", "score_ordering", "all"],
       "detected": "passes",
       "evidence": "0/300 caught (attack population seed 777, threshold from the seed 4242 honest population); every attacked account scores exactly 0.0.",
+      "reproduce": "python -m tripphysics.attack_measure silence-empty-fixes",
       "notes": "Worth listing separately from silence-no-trips because it is the version that survives a naive 'does this account have trips?' guard: the trip count looks normal and only the fix count is zero."
     },
     {
@@ -200,6 +207,7 @@
       "targets": ["handover_gap_score", "max_jump_m"],
       "detected": "caught",
       "evidence": "175/300 caught versus the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population).",
+      "reproduce": "python -m tripphysics.attack_measure drop-endpoint-fixes",
       "notes": "Trimming 3 fixes moves an endpoint by ~300 m at urban speed, which is small against handover excesses measured in kilometres. A deeper trim would trade against the trip looking implausibly short."
     },
     {
@@ -210,6 +218,7 @@
       "targets": ["overlap_rate"],
       "detected": "partial",
       "evidence": "130/300 caught, down from the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population). Median score 0.79 -> 0.42, the largest single-feature drop measured here.",
+      "reproduce": "python -m tripphysics.attack_measure deoverlap-restamp",
       "notes": "Confirms the weighting is doing what it claims -- overlap is the strongest evidence in the score -- and therefore that it is the most valuable single thing for an attacker to remove. Server-side receipt timestamps, which the client does not control, are what make this attack expensive."
     },
     {
@@ -220,6 +229,7 @@
       "targets": ["max_jump_m"],
       "detected": "caught",
       "evidence": "172/300 caught versus the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population).",
+      "reproduce": "python -m tripphysics.attack_measure kill-in-trip-teleports",
       "notes": "max_jump_m carries weight 1.5 but is largely redundant with handover_gap_score on these accounts, so removing it alone changes little."
     },
     {
@@ -240,6 +250,7 @@
       "targets": ["night_share"],
       "detected": "caught",
       "evidence": "183/300 caught versus the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population).",
+      "reproduce": "python -m tripphysics.attack_measure shift-night-trips",
       "notes": "Expected: night_share carries the smallest weight in the score (0.3) precisely because honest night drivers are common. Removing the weakest signal changes nothing, which is the correct behaviour."
     },
     {
@@ -250,6 +261,7 @@
       "targets": ["max_speed_kmh"],
       "detected": "caught",
       "evidence": "183/300 caught versus the unattacked 184/300 (attack population seed 777, threshold from the seed 4242 honest population).",
+      "reproduce": "python -m tripphysics.attack_measure speed-cap-under-center",
       "notes": "Boundary-hugging works as designed against this one feature and is worth nothing on its own at weight 0.8. Listed because it composes -- it is a component of full-client-evasion."
     },
     {

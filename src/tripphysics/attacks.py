@@ -2,9 +2,16 @@
 
 An evaluation harness that only reports the score it achieves on its own
 corpus is grading its own homework. The registry loaded here is the other
-half of the deliverable: a named, versioned list of the manipulations an
-account owner could apply to their own telemetry, each carrying a verdict
-about whether the current scoring survives it.
+half of the harness: a named, versioned, written record of the manipulations
+an account owner could apply to their own telemetry and of the harder sharing
+scenarios the generator can produce, each carrying a verdict about whether the
+current scoring survives it.
+
+It is a registry, not attack code. The verdicts were measured with one-off
+scripts that are not in this repository; :mod:`tripphysics.attack_measure`
+re-implements the subset that can be written unambiguously against the
+public API, and those entries carry a ``reproduce`` command. The rest are a
+record of what was run.
 
 Many of these attacks degrade the detector, and several defeat it outright.
 That is the point. Every
@@ -39,6 +46,8 @@ Every entry carries:
                 ``unmeasured -- reasoning only``. Reasoning is never dressed
                 up as measurement; an entry whose verdict came from reading
                 the code says so.
+``reproduce``   optional: the command in this repository that re-runs the
+                measurement and reproduces the count in ``evidence``
 
 The verdict scale
 -----------------
@@ -67,6 +76,8 @@ __all__ = [
     "REQUIRED_FIELDS",
     "load_registry",
     "verdict_counts",
+    "kind_of",
+    "kind_counts",
     "render_markdown",
 ]
 
@@ -102,6 +113,20 @@ _FEATURE_NAMES = (
 _NON_FEATURE_TARGETS = ("score_ordering", "evidence_free_path", "all")
 
 _UNMEASURED_EVIDENCE = "unmeasured -- reasoning only"
+
+# Every `reproduce` command has this shape; the id after it must be the
+# entry's own id, so a copied line cannot point one entry at another's run.
+_REPRODUCE_PREFIX = "python -m tripphysics.attack_measure "
+
+# Kinds of entry, in the order the summary prints them.
+KINDS = ("telemetry", "simulator", "unmeasured")
+_KIND_MEANINGS = {
+    "telemetry": "a manipulation applied to the account's own trip log",
+    "simulator": "a sharing scenario produced by changing the generator's "
+                 "parameters (`params` starts with `synth.py`); nothing is "
+                 "done to the log",
+    "unmeasured": "reasoned about, not measured",
+}
 
 
 def load_registry(path: str | None = None) -> dict[str, Any]:
@@ -147,6 +172,10 @@ def load_registry(path: str | None = None) -> dict[str, Any]:
         # reach the document as a Python repr.
         if "notes" in entry and not isinstance(entry["notes"], str):
             raise ValueError(f"attack {aid!r}: notes must be a string")
+        if "reproduce" in entry and entry["reproduce"] != _REPRODUCE_PREFIX + aid:
+            raise ValueError(
+                f"attack {aid!r}: reproduce must be exactly "
+                f"{_REPRODUCE_PREFIX + aid!r}")
 
         targets = entry["targets"]
         if not isinstance(targets, list) or not targets:
@@ -193,6 +222,29 @@ def verdict_counts(registry: dict[str, Any]) -> dict[str, int]:
     return counts
 
 
+def kind_of(entry: dict[str, Any]) -> str:
+    """``telemetry``, ``simulator`` or ``unmeasured`` -- see ``KINDS``.
+
+    Derived from the entry rather than stored, so the split the summary
+    prints cannot drift from the entries: an unmeasured entry is
+    ``unmeasured``; a measured one whose realization is a ``synth.py``
+    setting is ``simulator``; anything else was done to a trip log.
+    """
+    if entry["detected"] == "unmeasured":
+        return "unmeasured"
+    if entry["params"].startswith("synth.py"):
+        return "simulator"
+    return "telemetry"
+
+
+def kind_counts(registry: dict[str, Any]) -> dict[str, int]:
+    """Count entries per kind, in ``KINDS`` order."""
+    counts = {k: 0 for k in KINDS}
+    for entry in registry["attacks"]:
+        counts[kind_of(entry)] += 1
+    return counts
+
+
 def _md_escape(text: str) -> str:
     """Escape the one character that would break a Markdown table cell."""
     return text.replace("|", "\\|")
@@ -226,7 +278,16 @@ def render_markdown(registry: dict[str, Any]) -> str:
 
     lines.append("## Verdict summary")
     lines.append("")
-    lines.append(f"{total} attacks recorded.")
+    n_rerun = sum(1 for a in attacks if "reproduce" in a)
+    lines.append(f"{total} entries recorded. {n_rerun} of them can be re-run from "
+                 f"this repository with `python -m tripphysics.attack_measure`, "
+                 f"which reproduces their counts exactly; the others are a record.")
+    lines.append("")
+    kinds = kind_counts(registry)
+    lines.append("| kind | count | meaning |")
+    lines.append("| --- | --- | --- |")
+    for kind in KINDS:
+        lines.append(f"| {kind} | {kinds[kind]} | {_md_escape(_KIND_MEANINGS[kind])} |")
     lines.append("")
     lines.append("| verdict | count | meaning |")
     lines.append("| --- | --- | --- |")
@@ -252,6 +313,13 @@ def render_markdown(registry: dict[str, Any]) -> str:
             lines.append("")
             lines.append(f"**Evidence.** {entry['evidence']}")
             lines.append("")
+            if "reproduce" in entry:
+                lines.append(f"**Re-run.** `{entry['reproduce']}` reproduces "
+                             f"this count.")
+            else:
+                lines.append(f"**Re-run.** Not in this repository "
+                             f"({kind_of(entry)} entry).")
+            lines.append("")
             # `notes` is where the interpretation lives -- why a result is
             # weaker or stronger than it looks, what it would mean on real
             # data. Dropping it from the render would leave the document a
@@ -270,8 +338,10 @@ def main() -> None:
         fh.write(render_markdown(registry))
     counts = verdict_counts(registry)
     total = len(registry["attacks"])
-    print(f"wrote {MARKDOWN_PATH}: {total} attacks "
-          + ", ".join(f"{k}={v}" for k, v in counts.items()))
+    print(f"wrote {MARKDOWN_PATH}: {total} entries "
+          + ", ".join(f"{k}={v}" for k, v in counts.items()) + "; "
+          + ", ".join(f"{k}={v}" for k, v in kind_counts(registry).items())
+          + f"; re-runnable={sum(1 for a in registry['attacks'] if 'reproduce' in a)}")
 
 
 if __name__ == "__main__":

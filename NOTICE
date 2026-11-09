@@ -7,7 +7,8 @@ WHAT IS COVERED BY THAT LICENCE
 -------------------------------
 Everything in this repository: the measurement core (src/tripphysics/eval.py
 and the rest of the package), the synthetic data generator, the attack
-scripts, the tests, and the documentation. You may run it, read it, fork it
+registry and the code that re-runs part of it, the tests, and the
+documentation. You may run it, read it, fork it
 and reuse it under the MIT terms, including inside a commercial evaluation.
 
 The point of the permissive licence is that the measurement is auditable and
