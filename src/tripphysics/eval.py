@@ -224,6 +224,25 @@ def pr_auc(labels: dict[str, bool], scores: dict[str, float]) -> float:
     the *comparison* is fair; do not compare these values against AP
     numbers from other tooling.
 
+    What the anchor does when the top group is mixed (DEFECT-1, open). The
+    first trapezoid runs from the anchor (0, 1) to the first group's point.
+    If the highest-scoring group of tied scores contains honest accounts,
+    that segment credits precision the scorer never achieves at any
+    threshold. In the extreme case -- every score tied -- the whole curve is
+    the single segment from (0, 1) to (1, base rate), and the function
+    returns ``(1 + base_rate) / 2`` (0.55 at a 0.10 base rate) where a
+    non-informative scorer should get the base rate. The strict xfail in
+    ``tests/test_metric_edge_cases.py`` pins the correct value, and a
+    characterisation test pins today's. It is left open rather than patched
+    for the constant case alone because the real fix (start the curve at the
+    first group's own precision, or switch to average precision) changes
+    every value this function returns. It does not touch the figures in
+    the committed report: on that population the top group is 21 shared
+    accounts for the baseline and 1 shared account for the stacked scorer,
+    so the anchor and the first point both sit at precision 1. The
+    bring-your-own-scores command refuses a constant score column before
+    computing anything.
+
     Returns 0.0 when there are no positive labels.
     """
     n_pos = sum(1 for is_shared in labels.values() if is_shared)

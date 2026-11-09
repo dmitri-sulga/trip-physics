@@ -18,8 +18,8 @@ your own perimeter. It ships with a deterministic synthetic-data mode so the
 whole pipeline can be verified end-to-end before any real data is involved.
 
 Python 3.11+, numpy as the only runtime dependency. PR-AUC, thresholding and
-the headline metric are implemented by hand in `src/tripphysics/eval.py` — a
-few dozen lines you can audit, not a library call you have to trust.
+the headline metric are written out by hand in `src/tripphysics/eval.py`, with
+the reasoning in docstrings, rather than taken from a library.
 
 ## Quickstart
 
