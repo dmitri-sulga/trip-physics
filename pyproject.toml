@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trip-physics"
+version = "0.1.0"
+description = "Shadow-evaluation harness for profile-sharing detection: physics-first features, budgeted-recall metrics, deterministic synthetic data."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Dmitri Sulga", email = "europeworktallinn@gmail.com" }]
+keywords = ["fraud", "gps", "telematics", "evaluation", "shadow-deployment"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+# numpy is the only runtime dependency, on purpose: every metric in eval.py
+# (PR-AUC, budgeted thresholds) is implemented by hand so it can be audited
+# line by line instead of trusted as a library call.
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

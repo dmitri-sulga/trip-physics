@@ -1,0 +1,92 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: pytest on ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.11 is what the container pins; 3.14 is what the documented
+        # end-to-end runs were taken on. The golden anchors are asserted to
+        # 1e-9, so running both is also the portability check: if a numpy
+        # build shifts a headline metric, this job is where it surfaces.
+        python-version: ["3.11", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Record the environment the numbers were produced in
+        run: python -c "import sys, numpy; print('python', sys.version.split()[0], '| numpy', numpy.__version__)"
+
+      - name: Test suite
+        run: pytest -q
+
+      - name: Smoke run of the demo pipeline
+        run: python examples/run_demo.py --quick
+
+  determinism:
+    name: two runs, identical report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      # The claim is that the pipeline is seeded end to end. This runs it
+      # twice and compares hashes, so the claim is enforced rather than
+      # repeated in the README.
+      - name: Run twice and compare report hashes
+        run: |
+          python examples/run_demo.py --quick
+          shasum -a 256 out/report.json out/report.md > first.sha
+          python examples/run_demo.py --quick
+          shasum -a 256 out/report.json out/report.md > second.sha
+          cat first.sha
+          diff first.sha second.sha
+
+  dependency-audit:
+    name: dependency and static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install pip-audit bandit
+
+      - name: Known vulnerabilities in the dependency tree
+        run: pip-audit --strict
+
+      - name: Static security scan of the package
+        run: bandit -q -r src/

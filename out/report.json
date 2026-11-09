@@ -1,0 +1,177 @@
+{
+  "meta": {
+    "bootstrap_ci": {
+      "ci_high": 0.1849587832346454,
+      "ci_low": 0.0961819653365291,
+      "ci_valid": true,
+      "confidence": 0.95,
+      "degeneracy_rate": 0.0,
+      "n_degenerate": 0,
+      "n_resamples": 1000,
+      "u_point": 0.14285714285714277
+    },
+    "budget_curve": [
+      {
+        "R0": 0.555,
+        "R1": 0.585,
+        "U": 0.0540540540540539,
+        "budget_fp_per_10k": 15.0,
+        "default": false
+      },
+      {
+        "R0": 0.5566666666666666,
+        "R1": 0.6083333333333333,
+        "U": 0.09281437125748498,
+        "budget_fp_per_10k": 30.0,
+        "default": false
+      },
+      {
+        "R0": 0.56,
+        "R1": 0.64,
+        "U": 0.14285714285714277,
+        "budget_fp_per_10k": 50.0,
+        "default": true
+      },
+      {
+        "R0": 0.5666666666666667,
+        "R1": 0.69,
+        "U": 0.21764705882352936,
+        "budget_fp_per_10k": 100.0,
+        "default": false
+      },
+      {
+        "R0": 0.5766666666666667,
+        "R1": 0.7383333333333333,
+        "U": 0.2803468208092485,
+        "budget_fp_per_10k": 200.0,
+        "default": false
+      }
+    ],
+    "display_seed": 1,
+    "holdout_fp_check": {
+      "budget_fp_per_10k": 50.0,
+      "calibration_fraction": 0.5,
+      "n_calibration": 9700,
+      "n_measurement": 9700,
+      "realized_fp_per_10k_baseline": 46.391752577319586,
+      "realized_fp_per_10k_pilot": 70.10309278350516
+    },
+    "n_accounts": 20000,
+    "seed": 1,
+    "seed_sweep": {
+      "fraction_at_or_above_target": 0.0,
+      "max": 0.1986754966887419,
+      "mean": 0.15979529640871906,
+      "median": 0.1554645883236209,
+      "min": 0.12923076923076934,
+      "n_at_or_above_target": 0,
+      "n_seeds": 20,
+      "n_seeds_dropped_nonfinite": 0,
+      "n_seeds_supplied": 20,
+      "sd": 0.02000958738691707,
+      "target": 0.2
+    },
+    "seed_sweep_values": [
+      {
+        "U": 0.14285714285714277,
+        "seed": 1
+      },
+      {
+        "U": 0.16566265060240964,
+        "seed": 2
+      },
+      {
+        "U": 0.1847133757961784,
+        "seed": 3
+      },
+      {
+        "U": 0.1536050156739812,
+        "seed": 4
+      },
+      {
+        "U": 0.1566265060240964,
+        "seed": 5
+      },
+      {
+        "U": 0.14696485623003216,
+        "seed": 6
+      },
+      {
+        "U": 0.1464968152866242,
+        "seed": 7
+      },
+      {
+        "U": 0.1323529411764707,
+        "seed": 8
+      },
+      {
+        "U": 0.1873015873015872,
+        "seed": 9
+      },
+      {
+        "U": 0.1986754966887419,
+        "seed": 10
+      },
+      {
+        "U": 0.17350157728706628,
+        "seed": 11
+      },
+      {
+        "U": 0.13173652694610785,
+        "seed": 12
+      },
+      {
+        "U": 0.1543026706231454,
+        "seed": 13
+      },
+      {
+        "U": 0.12923076923076934,
+        "seed": 14
+      },
+      {
+        "U": 0.14925373134328365,
+        "seed": 15
+      },
+      {
+        "U": 0.14826498422712941,
+        "seed": 16
+      },
+      {
+        "U": 0.17405063291139244,
+        "seed": 17
+      },
+      {
+        "U": 0.159159159159159,
+        "seed": 18
+      },
+      {
+        "U": 0.18181818181818185,
+        "seed": 19
+      },
+      {
+        "U": 0.17933130699088135,
+        "seed": 20
+      }
+    ],
+    "shared_fraction": 0.03,
+    "synthetic": true
+  },
+  "metrics": {
+    "R0": 0.56,
+    "R1": 0.64,
+    "U": 0.14285714285714277,
+    "allowed_fp": 97,
+    "budget_fp_per_10k": 50.0,
+    "budget_utilization": 1.0,
+    "n_accounts": 20000,
+    "n_shared": 600,
+    "pr_auc_baseline": 0.6075077599825138,
+    "pr_auc_pilot": 0.7306764849079366,
+    "precision_at_500_baseline": 0.676,
+    "precision_at_500_pilot": 0.782,
+    "realized_fp": 97,
+    "realized_fp_per_10k": 50.0,
+    "threshold_baseline": 0.3492957746478873,
+    "threshold_pilot": 0.98035
+  }
+}

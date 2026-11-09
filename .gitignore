@@ -1,0 +1,21 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+# Ignore the CONTENTS of out/, not the directory itself. Excluding `out/`
+# outright would make git skip the directory without ever looking inside, and
+# the `!` re-includes below would silently never match.
+out/*
+# The rendered report IS a shipped artifact: the README points a reviewer at
+# it, so it must survive `git clone`.
+!out/report.md
+!out/report.json
+.coverage
+htmlcov/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.DS_Store
