@@ -9,8 +9,7 @@
 > real shadow logs, where the result would mean something.
 
 > Developed July–November 2026 and published here in November 2026 as a single
-> snapshot commit. An interactive companion page (GPS physics, a fraud-ring graph
-> under attack, a P&L sizer) is at https://dmitri-sulga.github.io/trust-firewall/
+> snapshot commit.
 
 One driver account, several people driving on it. This repo is a harness for
 measuring whether a physics-first detector adds recall on top of an existing
