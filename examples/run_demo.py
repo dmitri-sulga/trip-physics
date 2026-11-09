@@ -15,16 +15,17 @@ Two design decisions exist to keep that honest:
 
 1. **The headline is the median across seeds, never a single seed.** One
    seed is one draw from a distribution of synthetic worlds. At the old demo
-   size (2000 accounts, 60 positives) that distribution had an sd of ~8pp
-   and a range from +2% to +42% — so a single-seed headline reported mostly
-   luck. The seed shown in the detailed tables is just the first one; it is
+   size (2000 accounts, 60 positives) that distribution has an sd of
+   ~7.5pp and a range from +2.5% to +37.5% over seeds 1..25
+   (`examples/sample_size_table.py`) — so a single-seed headline reported
+   mostly luck. The seed shown in the detailed tables is just the first one; it is
    not selected for its result.
 
 2. **The default population is 20,000 accounts.** The README warns that U
    goes noisy below roughly 10k scored accounts, and the pilot pre-registers
    a minimum of 150 confirmed positives. The old 2000-account default sat
    below both of its own thresholds: 600 positives instead of 60 cuts the
-   across-seed sd from ~8pp to ~2pp.
+   across-seed sd from ~7.5pp to ~2pp.
 
 Everything is seeded; running this twice produces byte-identical reports.
 

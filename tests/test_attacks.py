@@ -102,7 +102,7 @@ def test_measured_evidence_names_a_population_size(registry):
     """Measured evidence has to state what it was measured on.
 
     A bare "31/300 caught" is unreproducible: at these population sizes the
-    repo's own documented spread (U sd ~8pp at 2000 accounts) is large enough
+    repo's own documented spread (U sd ~7.5pp at 2000 accounts) is large enough
     that the reader needs the n and the seed to know how much of a difference
     is real. Requiring the word 'seed' is a cheap proxy for that discipline.
     """

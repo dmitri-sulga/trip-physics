@@ -140,8 +140,8 @@ def _render_markdown(result: dict, meta: dict) -> str:
     if result["n_accounts"] < 10000:
         lines.append(f"> ⚠️ **Under-powered run — do not quote this number.** "
                      f"{result['n_accounts']} accounts is below the ~10k "
-                     f"floor at which U stabilizes; across seeds U has ranged "
-                     f"from +2% to +42% at this size. This is a smoke test. "
+                     f"floor at which U stabilizes; across seeds 1-25 at 2,000 "
+                     f"accounts U ranges from +2.5% to +37.5%. This is a smoke test. "
                      f"Run `python examples/run_demo.py --full` for the "
                      f"quotable figure.")
         lines.append("")

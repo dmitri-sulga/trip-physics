@@ -5,7 +5,7 @@
     "threshold": "0.707649 -- threshold_at_fp_budget on the honest population at the default 50 FP per 10k budget",
     "attack_population": "300 accounts, shared_fraction=1.0, seed=777, unless an entry names a different one",
     "unattacked_reference": "184/300 (61.3%) of unmodified shared accounts score above that threshold; every 'caught' figure below is read against 184/300, not against 300/300",
-    "noise": "300 accounts is a small population chosen so the whole registry could be measured in one sitting. A binomial standard error at p=0.6, n=300 is about 2.8pp, so differences under roughly 6pp are not distinguishable from noise, and the repo's own documented spread (U sd ~8pp at 2000 accounts) is the right prior for how much a single seed moves. Read these as one-significant-figure results: 0/300 and 292/300 are findings, 173/300 versus 184/300 is not."
+    "noise": "300 accounts is a small population chosen so the whole registry could be measured in one sitting. A binomial standard error at p=0.6, n=300 is about 2.8pp, so differences under roughly 6pp are not distinguishable from noise, and the repo's own documented spread (U sd ~7.5pp at 2000 accounts, `examples/sample_size_table.py`) is the right prior for how much a single seed moves. Read these as one-significant-figure results: 0/300 and 292/300 are findings, 173/300 versus 184/300 is not."
   },
   "verdict_meanings": {
     "caught": "the attack does not meaningfully help: the attacked population is still flagged at close to the un-attacked rate of 184/300",

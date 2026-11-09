@@ -204,19 +204,20 @@ used to describe a 2,000-account demo, which was below this repo's own stated
 noise floor ("U becomes noisy below roughly 10k scored accounts") and below
 the pilot's pre-registered 150-positive minimum — 2,000 accounts at a 3% base
 rate is 60 positives, and the entire headline rested on ~8 accounts changing
-hands. Measured across seeds, that is exactly as unstable as it sounds:
+hands. Measured across seeds 1..K (`python examples/sample_size_table.py`;
+the 20,000 row is the committed `--full` sweep):
 
 | accounts | positives | seeds | median U | sd of U   | range           |
 | -------- | --------- | ----- | -------- | --------- | --------------- |
-| 2,000    | 60        | 25    | +17.1%   | 8.2pp     | +2.5% … +41.7%  |
-| 5,000    | 150       | 10    | +17.2%   | 6.5pp     | +8.3% … +29.4%  |
-| 8,000    | 240       | 10    | +16.1%   | 3.9pp     | +6.1% … +20.9%  |
+| 2,000    | 60        | 25    | +16.7%   | 7.5pp     | +2.5% … +37.5%  |
+| 5,000    | 150       | 10    | +17.0%   | 7.5pp     | +8.3% … +30.9%  |
+| 8,000    | 240       | 10    | +16.7%   | 4.7pp     | +6.1% … +21.1%  |
 | 20,000   | 600       | 20    | +15.5%   | **2.0pp** | +12.9% … +19.9% |
 
-The median barely moves across all four rows — it stays between +15.5% and +17.2%.
-Only the spread collapses. That is the whole finding: **the sample size was
+The median barely moves across all four rows — it stays between +15.5% and +17.0%.
+The spread is what changes. That is the whole finding: **the sample size was
 the story, not the detector.** At 2,000 accounts a single seed could return
-anything from +2.5% to +41.7%, so any single-seed headline from that
+anything from +2.5% to +37.5%, so any single-seed headline from that
 configuration reported mostly luck. The demo therefore defaults to 20,000
 accounts and leads with a median.
 
