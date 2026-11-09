@@ -85,8 +85,12 @@ jobs:
           pip install -e ".[dev]"
           pip install pip-audit bandit
 
+      # The package under test is installed from this checkout and is not on
+      # PyPI, so there is nothing to look it up against, and `--strict` turned
+      # that into a failure before the bandit step below could run. Audit what
+      # came from PyPI and skip the local editable package.
       - name: Known vulnerabilities in the dependency tree
-        run: pip-audit --strict
+        run: pip-audit --skip-editable
 
       - name: Static security scan of the package
         run: bandit -q -r src/
