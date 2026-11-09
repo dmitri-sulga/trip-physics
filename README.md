@@ -230,7 +230,7 @@ rate measured on the other half.
 The shipped 20,000-account run reports a single split (`seed=0`): 46.4/10k for
 the baseline and 70.1/10k for the pilot, against a 50/10k budget. **That pair
 is not a property of the scorers.** Re-running the same check across 20 split
-seeds on the same population:
+seeds on the same population (`python examples/holdout_split_sweep.py`):
 
 | scorer   | budget   | median held-out rate | range over 20 splits |
 | -------- | -------- | -------------------- | -------------------- |
@@ -240,7 +240,8 @@ seeds on the same population:
 The pilot's median lands on the budget, not 40% over it, and the shipped
 `seed=0` value of 70.1 is the **highest of the 20 splits** — the next one down
 is 58.8. Re-drawing the population instead of the split tells the same story
-over 8 population seeds: the shipped `seed=1` is again the maximum, the median
+over 8 population seeds (`python examples/holdout_population_sweep.py`):
+the shipped `seed=1` is again the maximum, the median
 is 47.4/10k, and on five of the eight the pilot spends _no more_ than the
 baseline — the sign of the effect flips. Nor is the gap separable:
 `eval.holdout_fp_budget_ci()` puts a stratified bootstrap interval around each
@@ -253,11 +254,14 @@ in the measurement half, so a 50/10k budget expects 9,700 × 50/10,000 = 48.5
 flags. Poisson counting noise alone is √48.5 / 48.5 = **±14%**, and on top of
 that the threshold itself is fitted on the other 9,700 accounts, so
 threshold-selection variance adds to it. Spread of this width is what the
-measurement is made of. Unlike the uplift table above, this spread must not be
-read as converging: the flag count stays small by design — a tight FP budget is
-precisely a promise to produce few events — so the held-out rate remains
-sensitive to the split at every population size tested here, and does not
-collapse to a single quotable point the way the median U does.
+measurement is made of at this size. It does shrink as the honest population
+grows, but only as 1/√N, because a budget stated as a rate allows more flags in
+a larger population: over 200 splits of the same population, the relative
+spread of the stacked scorer's held-out rate falls from 52.8% at 2,425 honest
+accounts to 18.1% at 19,400, following √(2 / expected flags)
+(`python examples/holdout_spread_vs_n.py`). Halving it again takes four times
+the accounts: about 80,000 honest accounts for ±10% and 320,000 for ±5%. At the
+sizes in this repository one split is therefore not a quotable number.
 
 This is the instrument working, not a defect in it: a budget promise read off
 one split is exactly the kind of number this harness exists to refuse. Read
