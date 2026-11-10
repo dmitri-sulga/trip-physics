@@ -199,3 +199,38 @@ def test_registry_records_at_least_one_defeat(registry):
     assert counts["passes"] > 0, (
         "no attack in the registry defeats the detector, which is not a "
         "credible result for any scoring function")
+
+
+# ---------------------------------------------------------------------------
+# Re-runnable entries: the `reproduce` field and tripphysics.attack_measure
+# ---------------------------------------------------------------------------
+
+def test_every_reproduce_command_names_an_implemented_manipulation(registry):
+    """A `reproduce` line must point at code that exists, and vice versa.
+
+    The measured counts themselves are re-checked by
+    `scripts/check-claimed-numbers.sh --slow`, which runs the populations;
+    this test keeps the two lists in step without paying for that run.
+    """
+    from tripphysics.attack_measure import MANIPULATIONS
+
+    marked = {a["id"] for a in registry["attacks"] if "reproduce" in a}
+    assert marked == set(MANIPULATIONS)
+
+
+def test_loader_rejects_a_reproduce_command_for_another_entry(tmp_path, registry):
+    broken = json.loads(json.dumps(registry))
+    first = broken["attacks"][0]
+    first["reproduce"] = "python -m tripphysics.attack_measure silence-no-trips"
+    path = tmp_path / "registry.json"
+    path.write_text(json.dumps(broken), encoding="utf-8")
+    with pytest.raises(ValueError, match="reproduce must be exactly"):
+        load_registry(str(path))
+
+
+def test_kind_counts_cover_every_entry(registry):
+    from tripphysics.attacks import kind_counts
+
+    counts = kind_counts(registry)
+    assert sum(counts.values()) == len(registry["attacks"])
+    assert counts["unmeasured"] == verdict_counts(registry)["unmeasured"]

@@ -32,7 +32,7 @@ adds on top of an existing risk score at a fixed false-positive budget.
 | attack registry                                          | 41 entries: 18 caught, 12 partial, 6 pass, 5 unmeasured           | `python -m tripphysics.attacks`                  |
 | of which                                                 | 23 telemetry manipulations, 13 simulator settings, 5 unmeasured   | same                                             |
 | re-runnable registry entries                             | 11 of 41, each reproducing its recorded count                     | `python -m tripphysics.attack_measure`           |
-| test suite                                               | 555 passed, 1 xfailed                                             | `python -m pytest -q`                            |
+| test suite                                               | 577 passed, 1 xfailed                                             | `python -m pytest -q`                            |
 
 **What +15.5% is.** A check that the measurement works, on a simulator where
 the detector is right by construction, against a deliberately crude baseline
