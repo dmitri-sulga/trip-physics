@@ -10,12 +10,13 @@ import json
 import math
 import os
 
-# The pilot's pre-registered success bar (README, "The pass bar"): on the
-# operator's own shadow log, the stacked scorer must lift recall at the agreed
-# FP budget by at least this much, relative, over the baseline alone.
+# The acceptance bar fixed in advance for a run on real data (docs/method.md,
+# "The acceptance bar"): on a real shadow log, the stacked scorer must lift
+# recall at the agreed FP budget by at least this much, relative, over the
+# baseline alone.
 #
-# Scope matters more than the value. This bar applies to a pilot measured on
-# real confirmed-shared labels, with a pre-registered minimum of positives in
+# Scope matters more than the value. This bar applies to a run on real
+# confirmed-shared labels, with a pre-registered minimum of positives in
 # the window. It does NOT apply to the synthetic demo: there the generator and
 # the detector were written by the same hand, so the detector is correct by
 # construction and no pass/fail verdict on that data would mean anything.
@@ -152,18 +153,21 @@ def _render_markdown(result: dict, meta: dict) -> str:
         lines.append("> ")
         headline = (_fmt_pct(sweep["median"]) + f" (median of {sweep['n_seeds']} seeds)"
                     if sweep else _fmt_pct(u_value))
-        lines.append(f"> **(a) This synthetic demo: U = {headline}.** It proves "
+        lines.append(f"> **(a) This synthetic demo: U = {headline}.** It checks "
                      f"only that the pipeline computes the metric correctly "
                      f"end-to-end, on data where the detector's assumptions are "
-                     f"true by construction.")
+                     f"true by construction, against a deliberately crude "
+                     f"baseline (`NaiveBaseline`). It is not an estimate of "
+                     f"what the detector adds on real data.")
         lines.append("> ")
-        lines.append(f"> **(b) The pilot pass bar: U ≥ {_fmt_pct(U_TARGET)} on "
-                     f"your shadow log.** That is a different measurement, on "
-                     f"different data, against real confirmed-shared labels. "
-                     f"A synthetic number can neither pass nor fail it.")
+        lines.append(f"> **(b) The acceptance bar for real data: U ≥ "
+                     f"{_fmt_pct(U_TARGET)} on a real shadow log.** That is a "
+                     f"different measurement, on different data, against real "
+                     f"confirmed-shared labels. A synthetic number can neither "
+                     f"pass nor fail it.")
         lines.append("")
 
-    # --- Headline metrics, baseline vs. stacked pilot, EQUAL REALIZED spend.
+    # --- Headline metrics, baseline vs. stacked, EQUAL REALIZED spend.
     lines.append("## Headline metrics")
     lines.append("")
 
@@ -202,12 +206,12 @@ def _render_markdown(result: dict, meta: dict) -> str:
                      f"below at that realized spend, not at the budget: a "
                      f"headline uplift 'at equal FP spend' would otherwise "
                      f"compare the two scorers at a spend the baseline never "
-                     f"reaches, which overstates the pilot. Feed a finer "
+                     f"reaches, which overstates the stacked scorer. Feed a finer "
                      f"baseline score (calibrated probabilities rather than "
                      f"rounded buckets) to spend the full budget.")
         lines.append("")
 
-    lines.append("| metric | baseline | pilot (baseline + detector, stacked) |")
+    lines.append("| metric | baseline | stacked (baseline + detector) |")
     lines.append("|---|---|---|")
     lines.append(f"| recall at realized spend | {_fmt_float(result['R0'])} (R0) "
                  f"| {_fmt_float(result['R1'])} (R1) |")
@@ -232,12 +236,12 @@ def _render_markdown(result: dict, meta: dict) -> str:
     if curve:
         lines.append("## U across FP budgets")
         lines.append("")
-        lines.append("The pilot fixes ONE budget against the operator's stated tolerance "
-                     "before Day 1. This curve shows the whole trade-off around it, "
-                     "so the operating point is chosen openly, not for a flattering "
-                     "number.")
+        lines.append("A run on real data fixes ONE budget before the measurement "
+                     "starts. This curve shows the whole trade-off around the "
+                     "default, so the operating point is chosen openly, not for a "
+                     "flattering number.")
         lines.append("")
-        lines.append("| FP budget / 10k | R0 (baseline) | R1 (pilot) | U |")
+        lines.append("| FP budget / 10k | R0 (baseline) | R1 (stacked) | U |")
         lines.append("|---|---|---|---|")
         for row in curve:
             mark = " ← default" if row.get("default") else ""
@@ -274,16 +278,17 @@ def _render_markdown(result: dict, meta: dict) -> str:
         lines.append(f"| max | {_fmt_pct(sweep['max'])} |")
         lines.append(f"| seeds | {sweep['n_seeds']} |")
         lines.append("")
-        # Deliberately no hit-rate against the pilot bar here. Counting how many
+        # Deliberately no hit-rate against the acceptance bar here. Counting how many
         # synthetic seeds clear a threshold meant for real data is the exact
         # comparison this report tells the reader not to make, and phrasing it as
         # "N of M" reads as a pass rate no matter what disclaimer follows it.
         lines.append(f"The synthetic spread runs {_fmt_pct(sweep['min'])} … "
                      f"{_fmt_pct(sweep['max'])} (sd {sweep['sd'] * 100:.1f}pp). "
-                     f"The pilot bar of {_fmt_pct(sweep['target'])} sits above "
-                     f"that range on purpose: a bar this simulator clears on its "
-                     f"own would be a bar calibrated to the simulator rather than "
-                     f"to your traffic.")
+                     f"The real-data acceptance bar of "
+                     f"{_fmt_pct(sweep['target'])} sits above that range on "
+                     f"purpose: a bar this simulator clears on its own would be "
+                     f"a bar calibrated to the simulator rather than to real "
+                     f"traffic.")
         lines.append("")
         per_seed = meta.get("seed_sweep_values")
         if per_seed:
@@ -349,7 +354,7 @@ def _render_markdown(result: dict, meta: dict) -> str:
         lines.append("|---|---|---|")
         lines.append(f"| baseline | {_fmt_float(fp_check['budget_fp_per_10k'], 0)} / 10k "
                      f"| {fp_check['realized_fp_per_10k_baseline']:.1f} / 10k |")
-        lines.append(f"| pilot | {_fmt_float(fp_check['budget_fp_per_10k'], 0)} / 10k "
+        lines.append(f"| stacked | {_fmt_float(fp_check['budget_fp_per_10k'], 0)} / 10k "
                      f"| {fp_check['realized_fp_per_10k_pilot']:.1f} / 10k |")
         lines.append("")
         lines.append("The gap is the honest error bar on the budget promise. "
@@ -362,7 +367,7 @@ def _render_markdown(result: dict, meta: dict) -> str:
     lines.append("")
     lines.append("R0 is the baseline's recall on shared accounts when its "
                  "threshold is set to spend exactly the agreed FP budget on "
-                 "honest accounts. R1 is the same measurement for the pilot "
+                 "honest accounts. R1 is the same measurement for the stacked "
                  "scorer — the baseline stacked with the detector via "
                  "`max(rank-normalized baseline, rank-normalized detector)` — "
                  "at the *same* budget. U is the relative improvement. "
@@ -385,14 +390,14 @@ def _render_markdown(result: dict, meta: dict) -> str:
     lines.append("## Honest limits")
     lines.append("")
     lines.append("- **Synthetic data proves the harness works, not that the "
-                 "detector works on your traffic.** The synthetic sharing "
+                 "detector works on real traffic.** The synthetic sharing "
                  "patterns were designed alongside the detector; on real "
                  "trips both the base rates and the evasion behavior will "
-                 "differ. Measuring that is exactly what the 30-day shadow "
-                 "window is for.")
+                 "differ. Measuring that needs a shadow run on real logs with "
+                 "confirmed labels.")
     lines.append("- The bundled `NaiveBaseline` is a placeholder, not a model "
                  "of any production stack. Uplift over it is not uplift over "
-                 "your stack; plug in real scores via the `scores_csv` "
+                 "a real scoring system; plug in real scores via the `scores_csv` "
                  "adapter before reading anything into U.")
     lines.append("- **The threshold is calibrated on the same honest "
                  "population it is measured on.** In-sample the realized FP "

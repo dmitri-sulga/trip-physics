@@ -1,10 +1,10 @@
 """Bring Your Own Scores: run *your* risk scores through this harness.
 
 The rest of this repo measures a detector that has to be integrated first.
-This module measures scores you already have. You export two CSVs from your
-own warehouse, run one command inside your own perimeter, and get the same
-budgeted-recall arithmetic that ``eval.py`` applies to the demo -- with no
-data leaving the machine and no code of ours running against your database.
+This module measures scores you already have. Export one or two CSVs, run one
+command locally, and get the same budgeted-recall arithmetic that ``eval.py``
+applies to the demo -- with no data leaving the machine and none of this code
+running against the database the scores came from.
 
     python -m tripphysics.byos --scores scores.csv --labels labels.csv --out out/byos
 
@@ -311,7 +311,8 @@ def check_labels_usable_hard(labels: dict[str, bool], path: str) -> None:
 def warn_on_thin_labels(labels: dict[str, bool], path: str) -> None:
     """Say when the positive count is too small for the numbers to be quotable.
 
-    The pilot's pre-registered minimum is 150 confirmed positives. Below it
+    The minimum fixed in advance for a quotable run is 150 confirmed
+    positives (docs/method.md). Below it
     the output is still correct arithmetic, and someone testing the plumbing
     on one week of data should still get it -- but recall moves in visible
     steps of 1/n_shared, so the headline is a plumbing check rather than a
@@ -322,7 +323,7 @@ def warn_on_thin_labels(labels: dict[str, bool], path: str) -> None:
     if n_shared < 150:
         print(f"note: only {n_shared} confirmed-shared account(s) in {path}. "
               f"Recall moves in steps of 1/{n_shared} "
-              f"({100.0 / n_shared:.2f}pp), and this repo's pilot bar "
+              f"({100.0 / n_shared:.2f}pp), and this repo "
               f"pre-registers a minimum of 150 positives before a number is "
               f"quotable. Below that, treat what follows as a plumbing check, "
               f"not a measurement.")

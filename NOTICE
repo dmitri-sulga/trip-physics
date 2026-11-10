@@ -1,40 +1,23 @@
-trip-physics — shadow-evaluation harness for profile-sharing detection
+trip-physics — evaluation harness for shared-account detection
 Copyright (c) 2026 Dmitri Sulga
 
-Licensed under the MIT License. See LICENSE for the full text.
-
-WHAT IS COVERED BY THAT LICENCE
--------------------------------
-Everything in this repository: the measurement core (src/tripphysics/eval.py
-and the rest of the package), the synthetic data generator, the attack
-registry and the code that re-runs part of it, the tests, and the
-documentation. You may run it, read it, fork it
-and reuse it under the MIT terms, including inside a commercial evaluation.
-
-The point of the permissive licence is that the measurement is auditable and
-reusable. A metric you are not allowed to inspect is not evidence.
-
-WHAT IS NOT IN THIS REPOSITORY
-------------------------------
-Real data of any kind, and any detector tuned on real data. Everything here
-runs on the synthetic population described below.
+Licensed under the MIT License. See LICENSE for the full text. The licence
+covers everything in this repository: the package, the synthetic data
+generator, the attack registry and the code that re-runs part of it, the
+tests and the documentation.
 
 DATA PROVENANCE
 ---------------
 All data shipped or generated here is synthetic. It is produced by the
-generator in this repository from a fixed seed. No dataset from any company,
-customer or third party is included, and none was used to build it. No
-personal data of any kind is present.
+generator in this repository from fixed seeds. No dataset from any company or
+third party is included, none was used to build it, and no personal data of
+any kind is present. No detector in this repository was tuned on real data.
 
-The consequence is stated throughout the documentation and repeated here so it
-cannot be missed: numbers produced on this synthetic population describe the
-generator, not anyone's real traffic. The harness exists so the same
-measurement can be re-run inside your perimeter on your own logs, where the
-result would describe your traffic instead.
+Numbers produced on this synthetic population describe the generator, not
+anyone's real traffic.
 
 THIRD-PARTY COMPONENTS
 ----------------------
 Runtime: numpy (BSD 3-Clause).
-Development only: pytest (MIT) and the tooling declared in pyproject.toml.
-
-No vendored third-party source is included in this repository.
+Development only: pytest (MIT).
+No third-party source is vendored into this repository.

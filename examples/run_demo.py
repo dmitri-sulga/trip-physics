@@ -22,8 +22,8 @@ Two design decisions exist to keep that honest:
    not selected for its result.
 
 2. **The default population is 20,000 accounts.** The README warns that U
-   goes noisy below roughly 10k scored accounts, and the pilot pre-registers
-   a minimum of 150 confirmed positives. The old 2000-account default sat
+   goes noisy below roughly 10k scored accounts, and a real-data run is
+   specified with a minimum of 150 confirmed positives (docs/method.md). The old 2000-account default sat
    below both of its own thresholds: 600 positives instead of 60 cuts the
    across-seed sd from ~7.5pp to ~2pp.
 
@@ -36,6 +36,8 @@ Usage
     python examples/run_demo.py --quick    # smoke test: 2000 accounts, 17 s
 
     python examples/run_demo.py --accounts 5000 --seeds 10   # custom sweep
+    python examples/run_demo.py --full --workers 2   # cap memory: one 20k
+                                                     # population per worker
 
 Runtimes measured 2026-08-04 on an idle 14-core Apple-silicon laptop, Python
 3.14.5 with numpy 2.5.1; the sweep runs across processes, so wall time depends
@@ -78,7 +80,7 @@ from tripphysics.synth import generate_dataset
 OUT_DIR = "./out"
 
 # Defaults: 20k accounts at a 3% base rate = 600 positives, comfortably above
-# both the "10k accounts" noise floor and the pilot's 150-positive minimum.
+# both the "10k accounts" noise floor and the 150-positive minimum.
 N_ACCOUNTS = 20000
 SHARED_FRACTION = 0.03
 BUDGET_CURVE = (15.0, 30.0, 50.0, 100.0, 200.0)
@@ -157,6 +159,10 @@ def main() -> None:
                              "sample-size table in the README)")
     parser.add_argument("--seeds", type=int, default=None, metavar="K",
                         help="override the number of seeds in the sweep")
+    parser.add_argument("--workers", type=int, default=None, metavar="W",
+                        help="worker processes for the seed sweep (default: "
+                             "one per core). Each holds one population, so "
+                             "this is the memory knob.")
     args = parser.parse_args()
 
     # `is None`, not `or`: `--accounts 0` is falsy, so `args.accounts or
@@ -168,6 +174,8 @@ def main() -> None:
     n_seeds = args.seeds if args.seeds is not None else (20 if args.full else 3)
     if n_accounts < 1 or n_seeds < 1:
         parser.error("--accounts and --seeds must both be >= 1")
+    if args.workers is not None and args.workers < 1:
+        parser.error("--workers must be >= 1")
     seeds = list(range(1, n_seeds + 1))
 
     # Read the shipped reference BEFORE the run overwrites it. Step 5 below
@@ -180,7 +188,7 @@ def main() -> None:
     #    independent, so the sweep runs across processes.
     print(f"sweeping {n_seeds} seeds x {n_accounts} accounts "
           f"(feature extraction dominates; this is the slow part)...")
-    with ProcessPoolExecutor() as pool:
+    with ProcessPoolExecutor(max_workers=args.workers) as pool:
         sweep_rows = list(pool.map(
             _uplift_for_seed,
             [(n_accounts, SHARED_FRACTION, s) for s in seeds]))
@@ -269,7 +277,7 @@ def main() -> None:
           f"(one draw, NOT the headline):")
     print(f"accounts: {result['n_accounts']}   shared: {result['n_shared']}   "
           f"budget: {result['budget_fp_per_10k']} FP / 10k honest")
-    print(f"{'metric':<18}{'baseline':>10}{'pilot':>10}")
+    print(f"{'metric':<18}{'baseline':>10}{'stacked':>10}")
     for name, r0, r1 in (
             ("recall @ budget", result["R0"], result["R1"]),
             ("PR-AUC", result["pr_auc_baseline"], result["pr_auc_pilot"]),
@@ -283,7 +291,7 @@ def main() -> None:
     print(f"\nFP budget honesty (threshold fitted on half, spent on the other):")
     print(f"  budget {fp_check['budget_fp_per_10k']:.0f}/10k  ->  realized "
           f"baseline {fp_check['realized_fp_per_10k_baseline']:.1f}/10k, "
-          f"pilot {fp_check['realized_fp_per_10k_pilot']:.1f}/10k")
+          f"stacked {fp_check['realized_fp_per_10k_pilot']:.1f}/10k")
 
     print(f"\nU vs FP budget (uplift is not a single lucky point):")
     print(f"{'budget/10k':>12}{'R0':>8}{'R1':>8}{'U':>8}")
@@ -296,8 +304,8 @@ def main() -> None:
     print("This proves the pipeline computes U end-to-end. It does NOT show "
           "the detector works on real traffic:")
     print("the generator and the detector were written by the same hand. "
-          "The pilot bar (U >= +20%) is a")
-    print("different measurement on your shadow log — see README.")
+          "The acceptance bar (U >= +20%) is a")
+    print("different measurement, on real data — see docs/method.md.")
 
 
 if __name__ == "__main__":

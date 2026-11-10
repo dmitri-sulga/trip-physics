@@ -8,8 +8,8 @@ Honesty note
 ------------
 The synthetic corpus proves that the *harness* works: the plumbing, the
 metric math, the determinism, the report. It does NOT prove that the
-detector works on real traffic -- that is exactly what the 30-day shadow
-window is for. Distributions below are tuned to be *plausible*, not to
+detector works on real traffic -- that needs a shadow run on real logs
+with confirmed labels. Distributions below are tuned to be *plausible*, not to
 match any operator's fleet.
 
 What a "shared" account looks like here

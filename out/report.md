@@ -12,15 +12,15 @@
 
 > **Two different numbers, do not compare them.**
 > 
-> **(a) This synthetic demo: U = +15.5% (median of 20 seeds).** It proves only that the pipeline computes the metric correctly end-to-end, on data where the detector's assumptions are true by construction.
+> **(a) This synthetic demo: U = +15.5% (median of 20 seeds).** It checks only that the pipeline computes the metric correctly end-to-end, on data where the detector's assumptions are true by construction, against a deliberately crude baseline (`NaiveBaseline`). It is not an estimate of what the detector adds on real data.
 > 
-> **(b) The pilot pass bar: U ≥ +20.0% on your shadow log.** That is a different measurement, on different data, against real confirmed-shared labels. A synthetic number can neither pass nor fail it.
+> **(b) The acceptance bar for real data: U ≥ +20.0% on a real shadow log.** That is a different measurement, on different data, against real confirmed-shared labels. A synthetic number can neither pass nor fail it.
 
 ## Headline metrics
 
 Both scorers are measured at the **same realized FP spend**: 97 honest accounts flagged (50.0 per 10k), the largest spend a strict threshold reaches on both scorers without exceeding the 50.0/10k budget (utilization 100%).
 
-| metric | baseline | pilot (baseline + detector, stacked) |
+| metric | baseline | stacked (baseline + detector) |
 |---|---|---|
 | recall at realized spend | 0.5600 (R0) | 0.6400 (R1) |
 | PR-AUC | 0.6075 | 0.7307 |
@@ -32,9 +32,9 @@ Both scorers are measured at the **same realized FP spend**: 97 honest accounts 
 
 ## U across FP budgets
 
-The pilot fixes ONE budget against the operator's stated tolerance before Day 1. This curve shows the whole trade-off around it, so the operating point is chosen openly, not for a flattering number.
+A run on real data fixes ONE budget before the measurement starts. This curve shows the whole trade-off around the default, so the operating point is chosen openly, not for a flattering number.
 
-| FP budget / 10k | R0 (baseline) | R1 (pilot) | U |
+| FP budget / 10k | R0 (baseline) | R1 (stacked) | U |
 |---|---|---|---|
 | 15 | 0.5550 | 0.5850 | +5.4% |
 | 30 | 0.5567 | 0.6083 | +9.3% |
@@ -57,7 +57,7 @@ Each seed is an independent synthetic population (20000 accounts, 600 shared). A
 | max | +19.9% |
 | seeds | 20 |
 
-The synthetic spread runs +12.9% … +19.9% (sd 2.0pp). The pilot bar of +20.0% sits above that range on purpose: a bar this simulator clears on its own would be a bar calibrated to the simulator rather than to your traffic.
+The synthetic spread runs +12.9% … +19.9% (sd 2.0pp). The real-data acceptance bar of +20.0% sits above that range on purpose: a bar this simulator clears on its own would be a bar calibrated to the simulator rather than to real traffic.
 
 Per-seed U, every value from the sweep, none dropped:
 
@@ -97,13 +97,13 @@ The threshold is chosen on the same honest accounts the FP rate is then measured
 | scorer | budget | realized on held-out honest accounts |
 |---|---|---|
 | baseline | 50 / 10k | 46.4 / 10k |
-| pilot | 50 / 10k | 70.1 / 10k |
+| stacked | 50 / 10k | 70.1 / 10k |
 
 The gap is the honest error bar on the budget promise. It shrinks as the honest population grows and widens sharply on small samples.
 
 ## How to read U
 
-R0 is the baseline's recall on shared accounts when its threshold is set to spend exactly the agreed FP budget on honest accounts. R1 is the same measurement for the pilot scorer — the baseline stacked with the detector via `max(rank-normalized baseline, rank-normalized detector)` — at the *same* budget. U is the relative improvement. Holding the FP budget fixed is the point: any scorer can raise recall by flagging more people; U only rewards recall bought without additional honest-account cost. U can be negative if the detector adds noise instead of signal.
+R0 is the baseline's recall on shared accounts when its threshold is set to spend exactly the agreed FP budget on honest accounts. R1 is the same measurement for the stacked scorer — the baseline stacked with the detector via `max(rank-normalized baseline, rank-normalized detector)` — at the *same* budget. U is the relative improvement. Holding the FP budget fixed is the point: any scorer can raise recall by flagging more people; U only rewards recall bought without additional honest-account cost. U can be negative if the detector adds noise instead of signal.
 
 ## Run parameters
 
@@ -122,8 +122,8 @@ R0 is the baseline's recall on shared accounts when its threshold is set to spen
 
 ## Honest limits
 
-- **Synthetic data proves the harness works, not that the detector works on your traffic.** The synthetic sharing patterns were designed alongside the detector; on real trips both the base rates and the evasion behavior will differ. Measuring that is exactly what the 30-day shadow window is for.
-- The bundled `NaiveBaseline` is a placeholder, not a model of any production stack. Uplift over it is not uplift over your stack; plug in real scores via the `scores_csv` adapter before reading anything into U.
+- **Synthetic data proves the harness works, not that the detector works on real traffic.** The synthetic sharing patterns were designed alongside the detector; on real trips both the base rates and the evasion behavior will differ. Measuring that needs a shadow run on real logs with confirmed labels.
+- The bundled `NaiveBaseline` is a placeholder, not a model of any production stack. Uplift over it is not uplift over a real scoring system; plug in real scores via the `scores_csv` adapter before reading anything into U.
 - **The threshold is calibrated on the same honest population it is measured on.** In-sample the realized FP rate therefore matches the budget almost exactly by construction; out-of-sample it does not. The held-out check above sizes that gap instead of assuming it away. On real data, calibrate on a window that precedes the measurement window.
 - The threshold-at-budget procedure assumes the honest-score distribution is roughly stationary between the calibration window and the measurement window. Drift (app releases, seasonal patterns) moves the effective FP spend.
 - A single seed's U is one draw from a distribution, and at small sample sizes that distribution is wide. Any headline quoting one seed is reporting luck as much as signal — which is why the headline here is a median across seeds.

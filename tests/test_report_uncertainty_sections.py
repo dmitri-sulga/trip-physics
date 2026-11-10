@@ -89,7 +89,7 @@ def test_sweep_never_scores_the_simulator_against_the_pilot_bar(tmp_path):
     # Stronger than disclaiming the count: the report must not compute it at
     # all. "N of M seeds at or above the target" reads as a pass rate however
     # it is captioned, and the report tells the reader two paragraphs earlier
-    # that the synthetic number and the pilot bar are not comparable.
+    # that the synthetic number and the acceptance bar are not comparable.
     markdown = _render(tmp_path, dict(BASE_META, seed_sweep=SWEEP), "rate")
 
     assert "at or above" not in markdown

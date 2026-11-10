@@ -11,7 +11,7 @@ Ten minutes, one command, two CSVs you can produce with one query each.
 ## Install
 
 ```bash
-git clone <repo-url> trip-physics
+git clone https://github.com/dmitri-sulga/trip-physics.git
 cd trip-physics
 pip install -e .
 ```
@@ -170,8 +170,8 @@ Also refused, each with the file, the line and the fix: empty files, duplicate
 `account_id`, NaN or infinite scores, decimal commas, ragged rows, unparseable
 or blank label values, and label files whose account ids do not match the score
 file (reported with the overlap counts and the first few missing ids). No
-traceback is shown — a stack trace describes our call graph, which is not the
-thing that is broken.
+traceback is shown — a stack trace describes the harness's call graph, which is
+not the thing that is broken.
 
 If the population is too small for a budget to buy even one alert — 15/10k
 needs 667 honest accounts — that budget row is marked "budget buys 0 honest
@@ -181,7 +181,7 @@ you to read the output as a plumbing check.
 
 ---
 
-## Your data never leaves your perimeter
+## No network access
 
 The code makes zero network calls. There is no telemetry, no license check, no
 callback. numpy and the Python standard library are the only imports.
@@ -196,7 +196,8 @@ docker run --rm --network=none -v "$PWD:/data" trip-physics \
 
 `--network=none` removes the container's network stack entirely. If the harness
 tried to reach anything, it would fail rather than succeed quietly — which is
-the point: the claim is enforced by your runtime rather than promised by us.
+the point: the claim is enforced by the runtime rather than promised in a
+README.
 
 The same property is pinned without Docker, if you would rather check it in
 seconds than build an image: run the harness with Python's socket constructors
@@ -204,8 +205,8 @@ replaced by a function that raises. It completes normally and exits 0, because
 no code path in it opens a socket.
 
 The output file, `out/byos.json`, holds counts, rates and thresholds only. No
-account id and no score appears in it. That is the artifact you can circulate
-internally, or send back, when the underlying data cannot move.
+account id and no score appears in it. That is the artifact that can be
+shared when the underlying data cannot move.
 
 ---
 

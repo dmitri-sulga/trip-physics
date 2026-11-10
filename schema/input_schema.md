@@ -1,7 +1,7 @@
 # Input schema — shadow-log trip fixes
 
-This is the complete data contract for plugging a real shadow log into the
-harness. Ten fields per GPS fix, one JSON object per line (JSONL). Nothing else
+This is the complete input contract for running the harness on a real
+shadow log. Ten fields per GPS fix, one JSON object per line (JSONL). Nothing else
 is read.
 
 ## Fix record (one JSONL line per GPS fix)
@@ -66,16 +66,16 @@ To compare against the current stack, export its per-account scores as a CSV
 (`account_id,score`, one header line) and load with
 `tripphysics.baseline.load_scores_csv`. No production code changes needed.
 
-## What we deliberately do NOT need
+## What the harness deliberately does not read
 
 - **No PII.** No names, phone numbers, emails, documents, photos.
 - **No rider data.** Driver-side fixes only; nothing about who was in the car.
 - **No payment data.** No earnings, payouts, cards, invoices.
 - **No addresses or POI resolution.** Coordinates stay in an anonymous local
-  frame; `cell_id` may be salted-hashed on your side.
+  frame; `cell_id` may be salted-hashed before export.
 - **No device fingerprints** beyond the single OS mock-location bit.
-- **No live access.** Batch JSONL export, processed inside your perimeter, in a
-  container with egress blocked (see Dockerfile).
+- **No live access.** Batch JSONL export, processed locally, in a container
+  with egress blocked (see Dockerfile).
 
 If a field in this table looks like more than the detection task needs, that is
-a bug — report it and it gets cut.
+a design bug in the contract.

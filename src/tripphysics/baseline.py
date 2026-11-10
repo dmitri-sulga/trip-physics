@@ -4,9 +4,9 @@ Two ways to provide a baseline for the uplift comparison in ``eval.py``:
 
 * :class:`NaiveBaseline` -- a deliberately simple placeholder used by the
   synthetic demo so the harness runs end to end out of the box.
-* :func:`load_scores_csv` -- the adapter you actually want in a shadow
-  pilot: export your production risk scores per account and feed them in
-  without touching any code in this package.
+* :func:`load_scores_csv` -- the adapter for a run on real data: export the
+  production risk scores per account and feed them in without touching any
+  code in this package.
 """
 
 import csv
@@ -32,8 +32,8 @@ class NaiveBaseline:
 
     **REPLACE THIS.** This class exists only so the synthetic demo has a
     baseline to compare against. Any uplift measured against it says
-    nothing about uplift over your real stack. For the shadow pilot,
-    export your production scores per account and load them with
+    nothing about uplift over a real scoring system. For a run on real
+    data, export the production scores per account and load them with
     :func:`load_scores_csv` -- the evaluation code takes a plain
     ``{account_id: score}`` dict and never needs to know where the numbers
     came from.
@@ -89,9 +89,9 @@ class NaiveBaseline:
 def load_scores_csv(path: str) -> dict[str, float]:
     """Load per-account baseline scores from a CSV file.
 
-    This is the injection point for *your* production scores: the shadow
-    pilot compares against whatever numbers you put here, with no code
-    changes anywhere else.
+    This is the injection point for real production scores: a shadow run
+    compares against whatever numbers are put here, with no code changes
+    anywhere else.
 
     Accepted formats:
 

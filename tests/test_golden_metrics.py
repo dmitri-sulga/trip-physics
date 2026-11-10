@@ -95,7 +95,7 @@ def test_golden_metric_is_unchanged(demo_result, metric):
 def test_anchor_seed_uplift_sits_above_the_pilot_bar(demo_result):
     # A readable restatement of the golden U anchor (0.258), not a claim about
     # the detector: this one 2,000-account seed happens to land above the
-    # pilot bar U_TARGET. At this population size a single seed ranges from
+    # acceptance bar U_TARGET. At this population size a single seed ranges from
     # about +2.5% to +37.5% (`examples/sample_size_table.py`); the 20-seed
     # median at 20,000
     # accounts sits BELOW the bar, and no pass/fail applies to synthetic data.
