@@ -71,11 +71,11 @@ thresholded independently, do not spend the same number of false positives: a
 coarse baseline with rounded scores has ties sitting exactly on its threshold,
 those ties go unflagged, and it therefore buys fewer false positives than it was
 allowed. Its recall is depressed by the shortfall, and every point of that
-shortfall lands in `U` as if the pilot had earned it.
+shortfall lands in `U` as if the stacked scorer had earned it.
 
 Size of the error on data built to trigger it (a baseline rounded to 0.5): the
 coarse scorer spent **28.9 false positives per 10,000** out of a budget of 50,
-the pilot spent **50.0**, and the median uplift read **+147.6% instead of
+the stacked scorer spent **50.0**, and the median uplift read **+147.6% instead of
 +68.5%**. The phrase "at equal FP spend" in the README and in the report was
 false on any real stack with rounded probabilities or rule-counter scores —
 which is what an eight-year-old production baseline usually is.
@@ -195,7 +195,7 @@ the 2026-11-10 entry.
 ## 2026-07-26 — a feature was over-weighted, and the anchor moved
 
 `style_bimodality` separates at roughly AUC 0.54. It carried weight 2.0. Cut to
-0.3 after recalibration against a size-aware null. Pilot PR-AUC moved
+0.3 after recalibration against a size-aware null. Stacked PR-AUC moved
 0.7809983 → 0.7849702. Verified before re-anchoring the golden test: `R0`, `R1`
 and `U` unchanged to the last bit, the baseline arm untouched, inverting every
 label leaves the detector scores bit-identical, and the non-finite rate is

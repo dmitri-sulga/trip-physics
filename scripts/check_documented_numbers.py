@@ -105,7 +105,8 @@ def check_registry() -> None:
                         f"{k['simulator']} simulator settings, {k['unmeasured']} unmeasured")
     expect("README.md", f"{rerun} of {total}, each reproducing its recorded count")
     expect("README.md", f"a written record of {total} attacks")
-    expect("README.md", f"{rerun} of them can be re-run")
+    expect("README.md", f"{measured} of them with measured verdicts; {rerun} of "
+                        f"them can be re-run")
     expect("README.md", f"{measured - rerun} of the {measured} measured registry entries")
     expect("README.md", f"The {k['simulator']} simulator-setting entries")
     expect("CHANGELOG.md", f"re-runs the {rerun} entries")

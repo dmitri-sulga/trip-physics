@@ -17,8 +17,8 @@ adds on top of an existing risk score at a fixed false-positive budget.
   with the detector over the existing score alone, with both held to the same
   realized false-positive spend (default 50 per 10,000 honest accounts).
 - **The attack registry** is a written record of 41 attacks and harder sharing
-  scenarios with measured verdicts; 11 of them can be re-run from this
-  repository.
+  scenarios, 36 of them with measured verdicts; 11 of them can be re-run from
+  this repository.
 - Python 3.11+, numpy as the only runtime dependency. PR-AUC, thresholding and
   U are written out by hand in `src/tripphysics/eval.py`.
 
@@ -68,11 +68,12 @@ On every push ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-python examples/run_demo.py --quick      # smoke test
+python examples/run_demo.py --quick      # smoke test; overwrites out/
 python -m pytest -q
 ```
 
-`python examples/run_demo.py --full` reproduces the committed report; it holds
+Every demo run overwrites the committed report in `out/`; `git checkout --
+out/` restores it. `python examples/run_demo.py --full` reproduces it; it holds
 one 20,000-account population per worker process, so on a small machine add
 `--workers 2`. Timings, memory and Docker: [docs/running.md](docs/running.md).
 
