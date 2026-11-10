@@ -113,6 +113,13 @@ here as a snapshot in November 2026: the first commit is that snapshot, and
 the commits after it are corrections made in public. The CHANGELOG dates come
 from the private history. Single author.
 
+The code was written with AI coding tools: AI agents wrote it under my
+direction, and separate AI review sessions, set up to find faults rather than
+to confirm the work, then read it and tried to break it. What they found, and
+each fix, is in the CHANGELOG. I decide what to build and what to measure, and
+I do not accept a number until hand-computed cases, regression tests and
+repeated seeds agree with it.
+
 ---
 
 Dmitri Sulga · Tallinn · <europeworktallinn@gmail.com> · MIT
