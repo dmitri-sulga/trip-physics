@@ -4,6 +4,12 @@ A detector for shared driver accounts (one account, several people driving on
 it), built from trip physics, and a harness that measures what such a detector
 adds on top of an existing risk score at a fixed false-positive budget.
 
+A related interactive page, a GPS-physics check and a fraud-ring graph on
+synthetic data with the attacks that break them, is at
+<https://dmitri-sulga.github.io/trust-firewall/>. It lives in a separate
+repository ([trust-firewall](https://github.com/dmitri-sulga/trust-firewall))
+and does not run this code.
+
 - **All data here is synthetic.** It comes from the generator in
   `src/tripphysics/synth.py`, from fixed seeds. The generator and the detector
   were written by the same person, so on this data the detector is right by
