@@ -77,8 +77,7 @@ Size of the error on data built to trigger it (a baseline rounded to 0.5): the
 coarse scorer spent **28.9 false positives per 10,000** out of a budget of 50,
 the stacked scorer spent **50.0**, and the median uplift read **+147.6% instead of
 +68.5%**. The phrase "at equal FP spend" in the README and in the report was
-false on any real stack with rounded probabilities or rule-counter scores —
-which is what an eight-year-old production baseline usually is.
+false for any baseline whose scores are rounded probabilities or rule counters.
 
 Fixed by holding both scorers to the largest spend a strict threshold reaches
 on both ladders, so equal spend is a printed integer identity rather than a
