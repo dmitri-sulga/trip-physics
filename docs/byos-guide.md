@@ -84,6 +84,60 @@ python -m tripphysics.byos \
 Writes `out/byos.json` and `out/byos.md`. Exit code 0 on success, 2 on any
 input problem.
 
+On the synthetic example files shipped in `examples/`:
+
+```bash
+python -m tripphysics.byos \
+  --scores examples/byos_demo_scores.csv \
+  --baseline-scores examples/byos_demo_baseline.csv \
+  --out out/byos
+```
+
+prints:
+
+```
+========================================================================
+  trip-physics — measuring your scores, on your machine
+========================================================================
+
+Baseline (current stack): examples/byos_demo_baseline.csv
+Candidate (your new scores): examples/byos_demo_scores.csv
+Population: 4000 accounts (160 confirmed shared, 3840 honest)
+
+  At budget 50 false positives per 10,000 honest accounts:
+    R0 (baseline recall):   0.2562
+    R1 (stacked recall):    0.3563
+    U (relative uplift):    +39.0%
+    thresholds:             baseline 0.703405, stacked 0.98675
+    realized FP spend:      19 of the 19 honest flags the budget allows (49.5/10k, utilization 100%)
+
+    PR-AUC:        0.4895 -> 0.6150
+    precision@500: 0.2440 -> 0.2580
+
+    U 95% CI: [+1.5%, +74.2%] over 1000 resamples
+
+    Held-out FP check (threshold fitted on half the honest accounts,
+    measured on the other half): budget 50/10k -> baseline 68/10k, stacked 52/10k.
+    The gap is how much of the uplift is bought with budget the
+    in-sample threshold does not admit to spending.
+
+  U across budgets (the operating point is not chosen after the fact):
+
+    budget/10k        R0        R1         U
+         15      0.1688    0.2562      +51.9%
+         30      0.2000    0.3125      +56.2%
+         50      0.2562    0.3563      +39.0%
+        100      0.3500    0.4938      +41.1%
+        200      0.4437    0.6250      +40.8%
+
+Written: out/byos.json and out/byos.md (aggregate metrics only — no account id and no score is in either)
+```
+
+Those example files are synthetic and deliberately unflattering: the two
+scorers are strongly correlated, the CI's lower bound barely clears zero at
+160 positives, and the point of shipping them is that the command runs from a
+clean checkout, not that +39.0% means anything.
+
 ---
 
 ## What each number means

@@ -53,7 +53,9 @@ On every push ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 
 - Anything about real traffic. No real trip, driver or company data was used.
 - The 20-seed `--full` sweep and the held-out sweeps are too slow for CI.
-  They are re-run by hand.
+  They are re-run by hand; `bash scripts/check-claimed-numbers.sh --slow`
+  re-runs them and fails if a figure in this README or in `docs/method.md`
+  differs from what they print.
 - 25 of the 36 measured registry entries. Their verdicts were measured with
   one-off scripts that are not in this repository; for those entries the
   registry is a record of what was run, with the population and seed stated.

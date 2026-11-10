@@ -93,3 +93,17 @@ python -m pytest -q
 interpreter the package was installed into. `tests/test_eval_math.py` doubles
 as documentation: an 8-account fixture with hand-computed R0, R1 and U
 asserted exactly.
+
+## Checking the numbers in the documentation
+
+```bash
+bash scripts/check-claimed-numbers.sh          # the suite plus seconds
+bash scripts/check-claimed-numbers.sh --slow   # adds the sweeps; under an hour
+```
+
+The fast mode runs the test suite and checks every number the README states
+that can be read from committed artifacts (the report, the attack registry)
+or computed in seconds. `--slow` also re-runs the scripts behind the held-out
+tables, the sample-size table and the re-runnable attack entries, and fails
+if any figure in the README or in `docs/method.md` differs from what they
+print.
