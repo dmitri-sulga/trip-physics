@@ -12,7 +12,7 @@ and does not run this code.
 
 - **All data here is synthetic.** It comes from the generator in
   `src/tripphysics/synth.py`, from fixed seeds. The generator and the detector
-  were written by the same person, so on this data the detector is right by
+  were written in the same project, under one person's direction, so on this data the detector is right by
   construction. The numbers below check the measurement, not the detector.
 - **The detector** turns a trip log into eleven features (impossible jumps,
   overlapping trips, an account "teleporting" between trips, mock-location
@@ -111,7 +111,7 @@ Walkthrough: [docs/byos-guide.md](docs/byos-guide.md).
 Developed July–November 2026 in a private working repository and published
 here as a snapshot in November 2026: the first commit is that snapshot, and
 the commits after it are corrections made in public. The CHANGELOG dates come
-from the private history. Single author.
+from the private history. One person directed the work.
 
 The code was written with AI coding tools: AI agents wrote it under my
 direction, and separate AI review sessions, set up to find faults rather than
